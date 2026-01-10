@@ -1,0 +1,23 @@
+/**
+ * ESLint（typescript-eslint）が型情報（parserOptions.project）を使って解析するための tsconfig。
+ *
+ * 目的:
+ * - アプリ本体用の tsconfig.json はビルド/IDE向けの設定になっていることが多く、
+ *   ESLint が参照したいファイル（例: vite.config.ts）が include 対象外だと
+ *   「The file was not found in any of the provided project(s)」で失敗する。
+ *
+ * 使い方:
+ * - eslint.config.js 側で `parserOptions.project: ["./tsconfig.eslint.json"]` を指定して使う。
+ *
+ * 方針:
+ * - tsconfig.json を extends しつつ、Lint 対象にしたいファイル/ディレクトリだけを include に列挙する。
+ * - Lint を通したい設定ファイル（例: vite.config.ts）がある場合はここに追加する。
+ */
+{
+  "extends": "./tsconfig.json",
+  "include": [
+    "src/**/*.ts",
+    "src/**/*.tsx",
+    "vite.config.ts"
+  ]
+}
