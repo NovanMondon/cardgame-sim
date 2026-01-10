@@ -1,0 +1,8 @@
+{
+  "name": "Devcontainer",
+  "build": {
+    "dockerfile": "Dockerfile"
+  },
+  "workspaceFolder": "/workspaces/cardgame-sim",
+  "remoteUser": "vscode"
+}
