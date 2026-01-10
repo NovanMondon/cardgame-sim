@@ -1,3 +1,6 @@
+// devcontainer内で実行可能なシミュレーション
+// cd /workspaces/cardgame-sim/src/simulator && node main.ts
+
 type Card = {
   name: string,
   power: number
@@ -5,10 +8,19 @@ type Card = {
 
 function simulate_once() {
   const decks: Card[][] = [[
-    { name: "A1", power: 1 }
+    { name: "A1", power: 1 },
+    { name: "A2", power: 1 },
+    { name: "A3", power: 1 },
+    { name: "A4", power: 1 },
+    { name: "A5", power: 1 },
+    { name: "A6", power: 1 },
+    { name: "A7", power: 1 },
+    { name: "A8", power: 1 }
   ], [
-    { name: "A1", power: 1 }
+    { name: "X", power: 6 },
+    { name: "Y", power: 1 }
   ]];
+
   const fields: Card[][] = [[], []];
   let drawn: Card | null = null;
   let is_bench_over: boolean | null = null;
@@ -26,9 +38,10 @@ function simulate_once() {
     // カードを使用
     fields[tp] = play_card(drawn, fields[tp]);
     // パワーの判定
-    const powers = [calc_power(fields[0]), calc_power(fields[1])];
+    const tpPower = calc_power_tp(fields[tp]);
+    const ntpPower = calc_power_ntp(fields[ntp]);
     // カードの勝敗の判定
-    if (powers[tp] >= powers[ntp]) {
+    if (tpPower >= ntpPower) {
       [fields[ntp], benchs[ntp], is_bench_over] = send_to_bench(fields[ntp], benchs[ntp]);
       if (is_bench_over) { // ベンチあふれによる敗北
         return { winner: ntp, reason: "Bench Overflow" };
@@ -60,12 +73,17 @@ function play_card(drawn: Card, field: Card[]): Card[] {
   return resField;
 }
 
-function calc_power(deck: Card[]): number {
+function calc_power_tp(deck: Card[]): number {
   let resPower = 0;
   for (let i = 0; i < deck.length; i++) {
     resPower += deck[i].power;
   }
   return resPower;
+}
+
+function calc_power_ntp(deck: Card[]): number {
+  if (deck.length == 0) return 0;
+  return deck[deck.length - 1].power;
 }
 
 function send_to_bench(field: Card[], bench: Card[][]): [Card[], Card[][], boolean] {

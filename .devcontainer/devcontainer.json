@@ -4,5 +4,12 @@
     "dockerfile": "Dockerfile"
   },
   "workspaceFolder": "/workspaces/cardgame-sim",
-  "remoteUser": "vscode"
+  "remoteUser": "vscode",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "dbaeumer.vscode-eslint"
+      ]
+    }
+  }
 }
