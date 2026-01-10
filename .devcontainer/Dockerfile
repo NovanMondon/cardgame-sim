@@ -1,14 +1,30 @@
-FROM alpine:3.19
+FROM ubuntu:24.04
 
-RUN apk add --no-cache \
-    curl git ca-certificates bash sudo \
-    nodejs npm
+ENV DEBIAN_FRONTEND=noninteractive
 
-# add vscode user
-RUN addgroup -g 1000 -S vscode \
- && adduser -u 1000 -S -G vscode -s /bin/sh vscode
+RUN apt-get update \
+ && apt-get install -y --no-install-recommends \
+     ca-certificates curl git bash sudo \
+ && rm -rf /var/lib/apt/lists/*
+
+# Install Node.js 24.x from NodeSource (Ubuntu's default nodejs is usually outdated)
+RUN curl -fsSL https://deb.nodesource.com/setup_24.x | bash - \
+ && apt-get update \
+ && apt-get install -y --no-install-recommends nodejs \
+ && node --version \
+ && npm --version \
+ && rm -rf /var/lib/apt/lists/*
+
+# Remove default ubuntu user if it exists with GID 1000
+RUN userdel -r ubuntu 2>/dev/null || true
+
+# add vscode user (UID/GID 1000)
+RUN groupadd -g 1000 vscode \
+ && useradd -m -u 1000 -g 1000 -s /bin/bash vscode \
+ && echo "vscode ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/vscode \
+ && chmod 0440 /etc/sudoers.d/vscode
 
 USER vscode
 
-#entrypoint
+# entrypoint
 CMD ["bash"]
