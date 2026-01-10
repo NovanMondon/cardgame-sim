@@ -1,8 +1,4 @@
-
-export type Card = {
-  name: string,
-  power: number
-}
+import type { Card } from "./card";
 
 export class Game {
   private _log: (message: string) => void;

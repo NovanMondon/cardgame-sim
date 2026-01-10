@@ -1,29 +1,36 @@
 // devcontainer内で実行可能なシミュレーション
 // cd /workspaces/cardgame-sim/src/simulator && node main.ts
 
-import { Game, type Card } from "./game.ts"; // nodeで直接実行できるよう、.tsを明示してインポートする。
+import { validateCards, type Card } from "./card.ts";
+import { Game } from "./game.ts"; // nodeで直接実行できるよう、.tsを明示してインポートする。
+import { parse } from 'yaml';
 
+const deckAYAML = `
+- { name: "newcomer", power: 1 }
+- { name: "newcomer", power: 1 }
+- { name: "newcomer", power: 1 }
+- { name: "dog", power: 3 }
+- { name: "champion", power: 4 }
+- { name: "a1", power: 3 }
+- { name: "a2", power: 3 }
+- { name: "a3", power: 3 }
+`;
 
-const deckA: Card[] = [
-  { name: "newcomer", power: 1 },
-  { name: "newcomer", power: 1 },
-  { name: "newcomer", power: 1 },
-  { name: "dog", power: 3 },
-  { name: "champion", power: 4 },
-  { name: "a1", power: 3 },
-  { name: "a2", power: 3 },
-  { name: "a3", power: 3 },
-];
-const deckB: Card[] = [
-  { name: "newcomer", power: 1 },
-  { name: "newcomer", power: 1 },
-  { name: "newcomer", power: 1 },
-  { name: "dog", power: 3 },
-  { name: "champion", power: 4 },
-  { name: "a1", power: 3 },
-  { name: "a2", power: 3 },
-  { name: "a3", power: 3 },
-];
+const deckBYAML = `
+- { name: "newcomer", power: 1 }
+- { name: "newcomer", power: 1 }
+- { name: "newcomer", power: 1 }
+- { name: "dog", power: 3 }
+- { name: "champion", power: 4 }
+- { name: "a1", power: 3 }
+- { name: "a2", power: 3 }
+- { name: "a3", power: 3 }
+`;
+
+const deckA = parse(deckAYAML);
+if (!validateCards(deckA)) throw new Error("Invalid deckA");
+const deckB = parse(deckBYAML);
+if (!validateCards(deckB)) throw new Error("Invalid deckB");
 
 function shuffleDeck(deck: Card[]): Card[] {
   const resDeck: Card[] = [];
