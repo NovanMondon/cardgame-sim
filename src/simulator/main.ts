@@ -1,7 +1,7 @@
 // devcontainer内で実行可能なシミュレーション
 // cd /workspaces/cardgame-sim/src/simulator && node main.ts
 
-import { validateCards, type Card } from "./card.ts";
+import { shuffleDeck, validateCards } from "./card.ts";
 import { Game } from "./game.ts"; // nodeで直接実行できるよう、.tsを明示してインポートする。
 import { parse } from 'yaml';
 
@@ -31,20 +31,6 @@ const deckA = parse(deckAYAML);
 if (!validateCards(deckA)) throw new Error("Invalid deckA");
 const deckB = parse(deckBYAML);
 if (!validateCards(deckB)) throw new Error("Invalid deckB");
-
-function shuffleDeck(deck: Card[]): Card[] {
-  const resDeck: Card[] = [];
-  for (let i = 0; i < deck.length; i++) {
-    resDeck.push(deck[i]);
-  }
-
-  for (let i = resDeck.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [resDeck[i], resDeck[j]] = [resDeck[j], resDeck[i]];
-  }
-
-  return resDeck;
-}
 
 const startTime = performance.now(); // 時間計測
 const countTotal = 100000;

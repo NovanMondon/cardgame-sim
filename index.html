@@ -10,20 +10,28 @@
 </head>
 
 <body>
-  <div id="app">
-    <a href="https://vite.dev" target="_blank">
-      <img src="/vite.svg" class="logo" alt="Vite logo" />
-    </a>
-    <a href="https://www.typescriptlang.org/" target="_blank">
-      <img src="./src/typescript.svg" class="logo vanilla" alt="TypeScript logo" />
-    </a>
-    <h1>Vite + TypeScript</h1>
-    <div class="card">
-      <button id="counter" type="button"></button>
+  <div id="app" class="flex-vertical">
+    <div>
+      <h2>設定</h2>
+      <div class="flex-horizontal">
+        <div>
+          <h3>デッキA</h3>
+          <textarea id="deckA" rows="20" cols="80"></textarea>
+        </div>
+        <div>
+          <h3>デッキB</h3>
+          <textarea id="deckB" rows="20" cols="80"></textarea>
+        </div>
+      </div>
     </div>
-    <p class="read-the-docs">
-      Click on the Vite and TypeScript logos to learn more
-    </p>
+    <div>
+      <h2>実行</h2>
+      <button id="buttonSimulation">シミュレーション</button>
+    </div>
+    <div>
+      <h2>シミュレーション結果</h2>
+      <div id="simulationResult"></div>
+    </div>
   </div>
   <script type="module" src="/src/main.ts"></script>
 </body>
