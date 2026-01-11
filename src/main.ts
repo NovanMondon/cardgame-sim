@@ -1,8 +1,8 @@
 import { simulate } from "./simulate";
 
 const buttonSimulation = document.getElementById('buttonSimulation') as HTMLButtonElement;
-const textDeck0 = document.getElementById('deckA') as HTMLTextAreaElement;
-const textDeck1 = document.getElementById('deckB') as HTMLTextAreaElement;
+const textDeck0 = document.getElementById('deck0') as HTMLTextAreaElement;
+const textDeck1 = document.getElementById('deck1') as HTMLTextAreaElement;
 const simulationCount = document.getElementById('simulationCount') as HTMLInputElement;
 
 
