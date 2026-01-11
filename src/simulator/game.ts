@@ -1,11 +1,10 @@
 import type { Card } from "./card";
 import type { Result } from "./util";
+import * as jsonLogic from "json-logic-js";
 
 const tacticsSet: Map<string, (state: string) => string>[] = [
   new Map([["dog", (state: string) => {
-    const { picked } = JSON.parse(state) as { picked: Card };
-    if (picked.power >= 3) return "down";
-    return "up";
+    return jsonLogic.apply({ "if": [{ ">=": [{ "var": "picked.power" }, 3] }, "down", "up"] }, JSON.parse(state) as { picked: Card });
   }]]),
   new Map()
 ];
@@ -16,6 +15,7 @@ export class Game {
   constructor(log: (message: string) => void) {
     this._log = log;
   }
+
 
   // memo: 関数型っぽく書いているが、遅くなったら副作用多めのオブジェクト型に変えたい
   simulateOnce(decks: Card[][]) {
