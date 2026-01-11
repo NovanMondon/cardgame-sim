@@ -1,19 +1,40 @@
 
+import { parse } from "yaml";
+import { z, ZodError } from "zod";
+import type { Result } from "./util";
+
 export type Card = {
   name: string,
   power: number
 }
 
-// note: 将来的にはzodとかを使うと便利らしい
-export function validateCards(cards: unknown): cards is Card[] {
-  const cards_ = cards as Card[];
-  if (cards_ == undefined) return false;
-  if (cards_.length == undefined) return false;
-  for (let i = 0; i < cards_.length; i++) {
-    if (cards_[i].name == undefined) return false;
-    if (cards_[i].power == undefined) return false;
+//
+// 以下、Card関係のユーティリティ
+//
+const schemaCardCandidates = z.array(z.union([z.object({
+  name: z.string(),
+  power: z.number()
+})]));
+
+export function parseToCards(yaml: string): Result<Card[], string> {
+  try {
+    const source = parse(yaml);
+    const cardCandidates = schemaCardCandidates.parse(source);
+    return { ok: true, value: cardCandidates };
+  } catch (e) {
+    let message = "THROWN UNKNOWN";
+    if (e instanceof ZodError) {
+      const issue = e.issues[0];
+      message = `
+[${issue.code}]
+${issue.path} において、
+${issue.message}
+      `.trim();
+    } else if (e instanceof Error) {
+      message = e.message;
+    }
+    return { ok: false, error: message };
   }
-  return true;
 }
 
 export function shuffleDeck(deck: Card[]): Card[] {
