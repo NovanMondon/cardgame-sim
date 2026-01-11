@@ -1,5 +1,5 @@
 import { parse } from "yaml";
-import { apply, is_logic } from "json-logic-js";
+import { apply } from "json-logic-js";
 import type { Result } from "./util";
 
 export type Tactics = Map<string, (state: string) => string>
@@ -10,7 +10,6 @@ export function parseToTactics(tacticsYAML: string): Result<Tactics, string> {
 
   for (const key of ["dog"]) {
     if (raw[key] == undefined) return { ok: false, error: `${key} に対応する戦略が書かれていません。` };
-    if (!is_logic(raw[key])) return { ok: false, error: `${key} に対応する戦略が正しく書かれていません。` };
     result.set(key, (state: string) => {
       return apply(raw[key], JSON.parse(state));
     });
