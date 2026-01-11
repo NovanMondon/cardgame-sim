@@ -1,9 +1,8 @@
 // devcontainer内で実行可能なシミュレーション
 // cd /workspaces/cardgame-sim/src/simulator && node main.ts
 
-import { shuffleDeck, validateCards } from "./card.ts";
+import { parseToCards, shuffleDeck } from "./card.ts";
 import { Game } from "./game.ts"; // nodeで直接実行できるよう、.tsを明示してインポートする。
-import { parse } from 'yaml';
 
 const deckAYAML = `
 - { name: "newcomer", power: 1 }
@@ -27,21 +26,30 @@ const deckBYAML = `
 - { name: "a3", power: 3 }
 `;
 
-const deckA = parse(deckAYAML);
-if (!validateCards(deckA)) throw new Error("Invalid deckA");
-const deckB = parse(deckBYAML);
-if (!validateCards(deckB)) throw new Error("Invalid deckB");
+const deckA = parseToCards(deckAYAML);
+if (!deckA.ok) throw new Error(`deckAが異常!${deckA.error}`);
+const deckB = parseToCards(deckBYAML);
+if (!deckB.ok) throw new Error(`deckBが異常!${deckB.error}`);
 
 const startTime = performance.now(); // 時間計測
 const countTotal = 100000;
-let countAWin = 0;
+const countWinners = { A: 0, B: 0 };
+const countReasons: Record<string, number> = {};
+
 for (let i = 0; i < countTotal; i++) {
-  // 先行は固定
-  const shuffledDecks = [shuffleDeck(deckA), shuffleDeck(deckB)];
+  // point: 先行は固定
+  const shuffledDecks = [shuffleDeck(deckA.value), shuffleDeck(deckB.value)];
   const game = new Game(() => { });
   const result = game.simulateOnce(shuffledDecks);
-  if (result.winner == 0) countAWin++;
+  // 結果集計
+  if (result.winner == 0) {
+    countWinners.A++;
+  } else {
+    countWinners.B++;
+  }
+  countReasons[result.reason] = countReasons[result.reason] ? countReasons[result.reason] + 1 : 1;
 }
-console.log("AWin:", countAWin);
 const endTime = performance.now(); // 時間計測
+console.log("Winners:", countWinners);
+console.log("Reasons:", countReasons);
 console.log("Time:", (endTime - startTime) / countTotal * 1000000, "ns/game");

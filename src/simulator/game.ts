@@ -32,7 +32,7 @@ export class Game {
       if (tpPower >= ntpPower) {
         [fields[ntp], benchs[ntp], is_bench_over] = this.sendToBench(fields[ntp], benchs[ntp]);
         if (is_bench_over) { // ベンチあふれによる敗北
-          return { winner: ntp, reason: "Bench Overflow", fields: fields, benchs: benchs };
+          return { winner: tp, reason: "Bench Overflow", fields: fields, benchs: benchs };
         }
 
         [tp, ntp] = [ntp, tp];
