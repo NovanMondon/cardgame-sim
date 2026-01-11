@@ -57,11 +57,7 @@ textDeck1.value = `
 `.trim();
 
 textTactics1.value = `
-dog:
-  if:
-    - ">=": [{var: "picked.power"}, 3]
-    - "down"
-    - "up"
+dog: "up"
 `.trim();
 
 simulationCount.value = "10000";

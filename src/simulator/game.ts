@@ -2,22 +2,6 @@ import type { Card } from "./card";
 import type { Tactics } from "./tactics";
 import type { Result } from "./util";
 
-// const logicYAML = `
-// dog:
-//   if:
-//     - ">=": [{var: "picked.power"}, 3]
-//     - "down"
-//     - "up"
-// `;
-// const logic = parseYAML(logicYAML);
-
-// const tacticsSet: Tactics[] = [
-//   new Map([["dog", (state: string) => {
-//     return applyJsonLogic(logic["dog"], JSON.parse(state) as { picked: Card });
-//   }]]),
-//   new Map()
-// ];
-
 export class Game {
   private _log: (message: string) => void;
 
