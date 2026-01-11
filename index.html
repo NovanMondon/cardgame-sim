@@ -13,26 +13,43 @@
   <div id="app" class="flex-vertical">
     <div>
       <h2>設定</h2>
-      <div class="flex-horizontal">
+      <div class="flex-vertical">
         <div>
-          <h3>デッキ0</h3>
-          <textarea id="deck0" rows="20" cols="50"></textarea>
+          <div class="flex-horizontal">
+            <div>
+              <h3>デッキ0</h3>
+              <textarea id="deck0" rows="20" cols="50"></textarea>
+            </div>
+            <div>
+              <h3>戦略0</h3>
+              <textarea id="tactics0" rows="20" cols="50"></textarea>
+            </div>
+          </div>
         </div>
-        <div>
-          <h3>デッキ1</h3>
-          <textarea id="deck1" rows="20" cols="50"></textarea>
+
+        <div class="flex-horizontal">
+          <div>
+            <h3>デッキ1</h3>
+            <textarea id="deck1" rows="20" cols="50"></textarea>
+          </div>
+          <div>
+            <h3>戦略1</h3>
+            <textarea id="tactics1" rows="20" cols="50"></textarea>
+          </div>
         </div>
+
       </div>
     </div>
-    <div>
-      <h2>実行</h2>
-      <input id="simulationCount"/>回
-      <button id="buttonSimulation">シミュレーション</button>
-    </div>
-    <div>
-      <h2>シミュレーション結果</h2>
-      <textarea id="simulationResult" rows="80" cols="120"></textarea>
-    </div>
+  </div>
+  <div>
+    <h2>実行</h2>
+    <input id="simulationCount" />回
+    <button id="buttonSimulation">シミュレーション</button>
+  </div>
+  <div>
+    <h2>シミュレーション結果</h2>
+    <textarea id="simulationResult" rows="80" cols="120"></textarea>
+  </div>
   </div>
   <script type="module" src="/src/main.ts"></script>
 </body>

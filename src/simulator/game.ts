@@ -1,23 +1,22 @@
 import type { Card } from "./card";
+import type { Tactics } from "./tactics";
 import type { Result } from "./util";
-import { apply as applyJsonLogic } from "json-logic-js";
-import { parse as parseYAML } from "yaml";
 
-const logicYAML = `
-dog:
-  if:
-    - ">=": [{var: "picked.power"}, 3]
-    - "down"
-    - "up"
-`;
-const logic = parseYAML(logicYAML);
+// const logicYAML = `
+// dog:
+//   if:
+//     - ">=": [{var: "picked.power"}, 3]
+//     - "down"
+//     - "up"
+// `;
+// const logic = parseYAML(logicYAML);
 
-const tacticsSet: Map<string, (state: string) => string>[] = [
-  new Map([["dog", (state: string) => {
-    return applyJsonLogic(logic["dog"], JSON.parse(state) as { picked: Card });
-  }]]),
-  new Map()
-];
+// const tacticsSet: Tactics[] = [
+//   new Map([["dog", (state: string) => {
+//     return applyJsonLogic(logic["dog"], JSON.parse(state) as { picked: Card });
+//   }]]),
+//   new Map()
+// ];
 
 export class Game {
   private _log: (message: string) => void;
@@ -28,7 +27,7 @@ export class Game {
 
 
   // memo: 関数型っぽく書いているが、遅くなったら副作用多めのオブジェクト型に変えたい
-  simulateOnce(decks: Card[][]) {
+  simulateOnce(decks: Card[][], tacticsSet: Tactics[]) {
     let fields: Card[][] = [[], []];
     let drawn: Card | null = null;
     let is_bench_over: boolean | null = null;

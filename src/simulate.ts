@@ -1,9 +1,12 @@
 import { parseToCards, shuffleDeck, type Card } from "./simulator/card";
 import { Game } from "./simulator/game";
+import { parseToTactics, type Tactics } from "./simulator/tactics";
 
 export const simulate = (
   deck0YAML: string,
   deck1YAML: string,
+  tactic0YAML: string,
+  tactic1YAML: string,
   count: number,
   output: (message: string) => void
 ) => {
@@ -17,13 +20,23 @@ export const simulate = (
     output(`deck1のパースに失敗:\n${deck1.error}`);
     return;
   }
+  const tactics0 = parseToTactics(tactic0YAML);
+  if (!tactics0.ok) {
+    output(`tactics0のパースに失敗:\n${tactics0.error}`);
+    return;
+  }
+  const tactics1 = parseToTactics(tactic1YAML);
+  if (!tactics1.ok) {
+    output(`tactics1のパースに失敗:\n${tactics1.error}`);
+    return;
+  }
 
   output("Simulation Start");
 
   const startTime = performance.now();
   let gameResultCount: Record<string, number> = {};
   try {
-    gameResultCount = simulateLoop([deck0.value, deck1.value], count);
+    gameResultCount = simulateLoop([deck0.value, deck1.value], count, [tactics0.value, tactics1.value]);
   } catch (e) {
     if (e instanceof Error) {
       output(`ERROR THREW: ${e.message}`);
@@ -57,13 +70,13 @@ Whole Result:\n${JSON.stringify(sortGameResultCount(gameResultCount), null, 2)}
 
 type ResultKey = { winner: 0 | 1, reason: string }
 
-function simulateLoop(decks: Card[][], count: number): Record<string, number> {
+function simulateLoop(decks: Card[][], count: number, tacticsSet: Tactics[]): Record<string, number> {
   const gameResultCount: Record<string, number> = {};
   for (let i = 0; i < count; i++) {
     // 先行は固定
     const shuffledDecks = [shuffleDeck(decks[0]), shuffleDeck(decks[1])];
     const game = new Game(() => { });
-    const result = game.simulateOnce(shuffledDecks);
+    const result = game.simulateOnce(shuffledDecks, tacticsSet);
     // 結果集計
     const key = JSON.stringify({ winner: result.winner, reason: result.reason });
     gameResultCount[key] = (gameResultCount[key] ?? 0) + 1;
