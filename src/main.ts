@@ -21,7 +21,7 @@ textDeck0.value = `
 - { name: "newcomer", power: 1 }
 - { name: "newcomer", power: 1 }
 - { name: "talent", power: 2 }
-- { name: "dog", power: 3 }
+- { name: "dog", power: 3, effect: "dog" }
 - { name: "champion", power: 4 }
 - { name: "a1", power: 3 }
 - { name: "a2", power: 3 }
@@ -33,7 +33,7 @@ textDeck1.value = `
 - { name: "newcomer", power: 1 }
 - { name: "newcomer", power: 1 }
 - { name: "talent", power: 2 }
-- { name: "dog", power: 3 }
+- { name: "dog", power: 3, effect: "dog" }
 - { name: "champion", power: 4 }
 - { name: "a1", power: 3 }
 - { name: "a2", power: 3 }
