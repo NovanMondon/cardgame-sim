@@ -41,7 +41,7 @@ Time:
   Total ${elapsedTime} ms
   ${elapsedTime / count * 1000000} ns/game
 
-Whole Result:\n${JSON.stringify(gameResultCount, null, 2)}
+Whole Result:\n${JSON.stringify(sortGameResultCount(gameResultCount), null, 2)}
     `.trim());
 };
 
@@ -60,4 +60,19 @@ function simulateLoop(decks: Card[][], count: number): Record<string, number> {
   }
 
   return gameResultCount;
+}
+
+function sortGameResultCount(gameResultCount: Record<string, number>): Record<string, number> {
+  const entries = Object.entries(gameResultCount);
+
+  entries.sort(([a], [b]) => {
+    const ra = JSON.parse(a) as ResultKey;
+    const rb = JSON.parse(b) as ResultKey;
+
+    // winner -> reason でソート
+    if (ra.winner !== rb.winner) return ra.winner - rb.winner;
+    return ra.reason.localeCompare(rb.reason, "ja");
+  });
+
+  return Object.fromEntries(entries);
 }
