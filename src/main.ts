@@ -1,20 +1,22 @@
 import { simulate } from "./simulate";
 
 const buttonSimulation = document.getElementById('buttonSimulation') as HTMLButtonElement;
-const textDeckA = document.getElementById('deckA') as HTMLTextAreaElement;
-const textDeckB = document.getElementById('deckB') as HTMLTextAreaElement;
+const textDeck0 = document.getElementById('deckA') as HTMLTextAreaElement;
+const textDeck1 = document.getElementById('deckB') as HTMLTextAreaElement;
+const simulationCount = document.getElementById('simulationCount') as HTMLInputElement;
 
 
 buttonSimulation.addEventListener('click', () => {
   const writeResult = (message: string) => {
-    const result = document.getElementById('simulationResult') as HTMLElement;
-    result.innerText = message;
+    const result = document.getElementById('simulationResult') as HTMLTextAreaElement;
+    result.value = message;
   };
+  const count = Number.parseInt(simulationCount.value);
 
-  simulate(textDeckA.value, textDeckB.value, writeResult);
+  simulate(textDeck0.value, textDeck1.value, count, writeResult);
 });
 
-textDeckA.value = `
+textDeck0.value = `
 - { name: "newcomer", power: 1 }
 - { name: "newcomer", power: 1 }
 - { name: "newcomer", power: 1 }
@@ -26,7 +28,7 @@ textDeckA.value = `
 - { name: "a3", power: 3 }
 `.trim();
 
-textDeckB.value = `
+textDeck1.value = `
 - { name: "newcomer", power: 1 }
 - { name: "newcomer", power: 1 }
 - { name: "newcomer", power: 1 }
@@ -37,3 +39,5 @@ textDeckB.value = `
 - { name: "a2", power: 3 }
 - { name: "a3", power: 3 }
 `.trim();
+
+simulationCount.value = "100000";
