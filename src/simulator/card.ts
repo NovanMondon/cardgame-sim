@@ -5,7 +5,8 @@ import type { Result } from "./util";
 
 export type Card = {
   name: string,
-  power: number
+  power: number,
+  effect?: string,
 }
 
 //
@@ -13,7 +14,8 @@ export type Card = {
 //
 const schemaCardCandidates = z.array(z.union([z.object({
   name: z.string(),
-  power: z.number()
+  power: z.number(),
+  effect: z.optional(z.string()),
 })]));
 
 export function parseToCards(yaml: string): Result<Card[], string> {

@@ -1,4 +1,22 @@
 import type { Card } from "./card";
+import type { Tactics } from "./tactics";
+import type { Result } from "./util";
+
+// const logicYAML = `
+// dog:
+//   if:
+//     - ">=": [{var: "picked.power"}, 3]
+//     - "down"
+//     - "up"
+// `;
+// const logic = parseYAML(logicYAML);
+
+// const tacticsSet: Tactics[] = [
+//   new Map([["dog", (state: string) => {
+//     return applyJsonLogic(logic["dog"], JSON.parse(state) as { picked: Card });
+//   }]]),
+//   new Map()
+// ];
 
 export class Game {
   private _log: (message: string) => void;
@@ -7,11 +25,13 @@ export class Game {
     this._log = log;
   }
 
-  simulateOnce(decks: Card[][]) {
-    const fields: Card[][] = [[], []];
+
+  // memo: 関数型っぽく書いているが、遅くなったら副作用多めのオブジェクト型に変えたい
+  simulateOnce(decks: Card[][], tacticsSet: Tactics[]) {
+    let fields: Card[][] = [[], []];
     let drawn: Card | null = null;
     let is_bench_over: boolean | null = null;
-    const benchs: Card[][][] = [[], []];
+    let benchs: Card[][][] = [[], []];
     // let trash = [[], []];
     let tp: 0 | 1 = 0; // turn player
     let ntp: 0 | 1 = 1; // non turn player
@@ -19,12 +39,15 @@ export class Game {
     this._log("start simulation");
     while (true) {
       // カードをめくる
-      if (decks[tp].length <= 0) {
+      const drawCardResult = this.drawCard(decks[tp]);
+      if (!drawCardResult.ok) {
         return { winner: ntp, reason: "Deck Empty", fields: fields, benchs: benchs };
       }
-      [decks[tp], drawn] = this.drawCard(decks[tp]);
-      // カードを使用
-      fields[tp] = this.playCard(drawn, fields[tp]);
+      [decks[tp], drawn] = drawCardResult.value;
+      // カードの効果適用
+      [drawn, decks, fields, benchs] = this.playCard(drawn, decks, fields, benchs, tp, tacticsSet[tp]);
+      // カードの配置
+      fields[tp] = this.placeCard(drawn, fields[tp]);
       // パワーの判定
       const tpPower = this.calcPowerTP(fields[tp]);
       const ntpPower = this.calcPowerNTP(fields[ntp]);
@@ -40,22 +63,52 @@ export class Game {
     }
   }
 
-  drawCard(deck: Card[]): [Card[], Card] {
-    const resCard = deck[0];
-    const resDeck: Card[] = [];
-    for (let i = 0; i < deck.length; i++) {
-      if (i == 0) continue;
-      resDeck.push(deck[i]);
-    }
+  drawCard(deck: Card[]): Result<[Card[], Card], null> {
+    const resDeck: Card[] = [...deck];
+    const resCard = resDeck.shift();
+    if (resCard == undefined) return { ok: false, error: null };
 
-    return [resDeck, resCard];
+    return { ok: true, value: [resDeck, resCard] };
   }
 
-  playCard(drawn: Card, field: Card[]): Card[] {
-    const resField: Card[] = [];
-    for (let i = 0; i < field.length; i++) {
-      resField.push(field[i]);
-    }
+  playCard(
+    drawn: Card,
+    decks: Card[][],
+    field: Card[][],
+    benchs: Card[][][],
+    tp: 0 | 1,
+    tactics: Map<string, (state: string) => string>
+  ): [Card, Card[][], Card[][], Card[][][]] {
+    const resDrawn = drawn;
+    const resDecks = [[...decks[0]], [...decks[1]]];
+    const resField = [[...field[0]], [...field[1]]];
+    const resBenchs = [[...benchs[0]], [...benchs[1]]];
+
+    (() => {
+      if (resDrawn.effect == "dog") {
+        const tactic = tactics.get("dog");
+        if (tactic) {
+          if (resDecks[tp].length <= 1) return;
+          const picked = resDecks[tp][0];
+          const command = tactic(JSON.stringify({ "picked": picked }));
+          switch (command) {
+            case "down":
+              resDecks[tp].shift();
+              resDecks[tp].push(picked);
+              break;
+            case "up":
+              break;
+            default: throw new Error(`Unknown tactic command: ${command}`);
+          }
+        }
+      }
+    })();
+
+    return [resDrawn, resDecks, resField, resBenchs];
+  }
+
+  placeCard(drawn: Card, field: Card[]): Card[] {
+    const resField: Card[] = [...field];
     resField.push(drawn);
 
     return resField;
@@ -75,14 +128,9 @@ export class Game {
   }
 
   sendToBench(field: Card[], bench: Card[][]): [Card[], Card[][], boolean] {
-    const resField: Card[] = [];
-    for (let i = 0; i < field.length; i++) {
-      resField.push(field[i]);
-    }
-    const resBench: Card[][] = [];
-    for (let i = 0; i < bench.length; i++) {
-      resBench.push(bench[i]);
-    }
+    const resField: Card[] = [...field];
+    const resBench: Card[][] = [...bench];
+
     while (resField.length > 0) {
       const target = resField[resField.length - 1];
       const is_bench_over = (() => {
