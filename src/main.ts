@@ -40,4 +40,4 @@ textDeck1.value = `
 - { name: "a3", power: 3 }
 `.trim();
 
-simulationCount.value = "1000";
+simulationCount.value = "10000";

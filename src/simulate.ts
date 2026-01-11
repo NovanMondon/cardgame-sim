@@ -21,7 +21,17 @@ export const simulate = (
   output("Simulation Start");
 
   const startTime = performance.now();
-  const gameResultCount = simulateLoop([deck0.value, deck1.value], count);
+  let gameResultCount: Record<string, number> = {};
+  try {
+    gameResultCount = simulateLoop([deck0.value, deck1.value], count);
+  } catch (e) {
+    if (e instanceof Error) {
+      output(`ERROR THREW: ${e.message}`);
+    } else {
+      output(`UNKNOWN THREW`);
+    }
+    return;
+  }
   const endTime = performance.now();
   const elapsedTime = endTime - startTime;
 

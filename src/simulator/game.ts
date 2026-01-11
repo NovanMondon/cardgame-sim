@@ -1,6 +1,15 @@
 import type { Card } from "./card";
 import type { Result } from "./util";
 
+const tacticsSet: Map<string, (state: string) => string>[] = [
+  new Map([["dog", (state: string) => {
+    const { picked } = JSON.parse(state) as { picked: Card };
+    if (picked.power >= 3) return "down";
+    return "up";
+  }]]),
+  new Map()
+];
+
 export class Game {
   private _log: (message: string) => void;
 
@@ -8,6 +17,7 @@ export class Game {
     this._log = log;
   }
 
+  // memo: 関数型っぽく書いているが、遅くなったら副作用多めのオブジェクト型に変えたい
   simulateOnce(decks: Card[][]) {
     let fields: Card[][] = [[], []];
     let drawn: Card | null = null;
@@ -26,7 +36,7 @@ export class Game {
       }
       [decks[tp], drawn] = drawCardResult.value;
       // カードの効果適用
-      [drawn, decks, fields, benchs] = this.playCard(drawn, decks, fields, benchs, tp, new Map());
+      [drawn, decks, fields, benchs] = this.playCard(drawn, decks, fields, benchs, tp, tacticsSet[tp]);
       // カードの配置
       fields[tp] = this.placeCard(drawn, fields[tp]);
       // パワーの判定
@@ -61,20 +71,26 @@ export class Game {
     tactics: Map<string, (state: string) => string>
   ): [Card, Card[][], Card[][], Card[][][]] {
     const resDrawn = drawn;
-    const resDecks = structuredClone(decks);
-    const resField = structuredClone(field);
-    const resBenchs = structuredClone(benchs);
+    const resDecks = [[...decks[0]], [...decks[1]]];
+    const resField = [[...field[0]], [...field[1]]];
+    const resBenchs = [[...benchs[0]], [...benchs[1]]];
 
     (() => {
       if (resDrawn.effect == "dog") {
-        if (tactics.has("dog")) {
-          // do nothing
-        } else {
-          if(resDecks[tp].length <= 1) return;
+        const tactic = tactics.get("dog");
+        if (tactic) {
+          if (resDecks[tp].length <= 1) return;
           const picked = resDecks[tp][0];
-
-          resDecks[tp].shift();
-          resDecks[tp].push(picked);
+          const command = tactic(JSON.stringify({ "picked": picked }));
+          switch (command) {
+            case "down":
+              resDecks[tp].shift();
+              resDecks[tp].push(picked);
+              break;
+            case "up":
+              break;
+            default: throw new Error(`Unknown tactic command: ${command}`);
+          }
         }
       }
     })();
