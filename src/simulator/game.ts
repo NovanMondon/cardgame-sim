@@ -1,10 +1,20 @@
 import type { Card } from "./card";
 import type { Result } from "./util";
-import * as jsonLogic from "json-logic-js";
+import { apply as applyJsonLogic } from "json-logic-js";
+import { parse as parseYAML } from "yaml";
+
+const logicYAML = `
+dog:
+  if:
+    - ">=": [{var: "picked.power"}, 3]
+    - "down"
+    - "up"
+`;
+const logic = parseYAML(logicYAML);
 
 const tacticsSet: Map<string, (state: string) => string>[] = [
   new Map([["dog", (state: string) => {
-    return jsonLogic.apply({ "if": [{ ">=": [{ "var": "picked.power" }, 3] }, "down", "up"] }, JSON.parse(state) as { picked: Card });
+    return applyJsonLogic(logic["dog"], JSON.parse(state) as { picked: Card });
   }]]),
   new Map()
 ];
