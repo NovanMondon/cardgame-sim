@@ -33,14 +33,23 @@ if (!deckB.ok) throw new Error(`deckBが異常!${deckB.error}`);
 
 const startTime = performance.now(); // 時間計測
 const countTotal = 100000;
-let countAWin = 0;
+const countWinners = { A: 0, B: 0 };
+const countReasons: Record<string, number> = {};
+
 for (let i = 0; i < countTotal; i++) {
-  // 先行は固定
+  // point: 先行は固定
   const shuffledDecks = [shuffleDeck(deckA.value), shuffleDeck(deckB.value)];
   const game = new Game(() => { });
   const result = game.simulateOnce(shuffledDecks);
-  if (result.winner == 0) countAWin++;
+  // 結果集計
+  if (result.winner == 0) {
+    countWinners.A++;
+  } else {
+    countWinners.B++;
+  }
+  countReasons[result.reason] = countReasons[result.reason] ? countReasons[result.reason] + 1 : 1;
 }
-console.log("AWin:", countAWin);
 const endTime = performance.now(); // 時間計測
+console.log("Winners:", countWinners);
+console.log("Reasons:", countReasons);
 console.log("Time:", (endTime - startTime) / countTotal * 1000000, "ns/game");
